@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+<meta charset="utf-8">
+<script>try{var _d=document.documentElement,_u=localStorage.getItem("ui"),_z=localStorage.getItem("uiScale");if(_u&&_u!=="default")_d.setAttribute("data-ui",_u);if(_z==="90"||_z==="100")_d.setAttribute("data-scale",_z)}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Log Run</title>
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+<link rel="manifest" href="./site.webmanifest">
+<meta name="theme-color" content="#08080A">
+<link rel="shortcut icon" href="./favicon.ico">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Anton&family=Oswald:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080A;--card:#101011;--card-hover:#171718;--border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.14);--text:#EDEDED;--muted:#9F9FA9;--lime:#D6FF57;--lime-soft:rgba(214,255,87,0.14)}
+.light{--bg:#F6F6F5;--card:#FFFFFF;--card-hover:#F4F4F5;--border:#E8E8E3;--border-strong:#D4D4D0;--text:#111113;--muted:#78787C;--lime:#65A30D;--lime-soft:rgba(101,163,13,0.14)}
+*{font-family:Inter,system-ui,sans-serif;box-sizing:border-box} 
+html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+.mono{font-family:"JetBrains Mono",monospace}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px; max-width: 100%;}
+.input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-size:13px;outline:none;color:var(--text)}
+.input:focus{border-color:var(--lime);box-shadow:0 0 0 3px var(--lime-soft)}
+.btn{padding:6px 12px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
+.btn:hover{border-color:var(--border-strong)} .btn-lime{background:var(--lime);color:#08080A;border-color:var(--lime);font-weight:700}
+.btn-icon{width:32px;height:32px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.icon-grad{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#08080A;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.1), inset 0 0 0 1px rgba(255,255,255,.08)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--border)}
+.glass{backdrop-filter:blur(16px);background:color-mix(in srgb,var(--card) 84%, transparent);border:1px solid var(--border)}
+.btn.on{border-color:var(--lime);background:var(--lime-soft)}
+.chk{background-image:linear-gradient(45deg,#8883 25%,transparent 25%),linear-gradient(-45deg,#8883 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#8883 75%),linear-gradient(-45deg,transparent 75%,#8883 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+@media(max-width:639px){.icon-grad.ic-hide{display:none}}
+.card-st{background:linear-gradient(135deg,var(--lime-soft),transparent 65%),var(--card);border-color:color-mix(in srgb,var(--lime) 28%,transparent)}
+.card-pb{background:linear-gradient(135deg,rgba(251,191,36,.14),rgba(251,191,36,.04) 70%),var(--card);border-color:rgba(251,191,36,.35)}
+.card-pb .pbl,.card-pb .pbv{color:#F59E0B}
+.light .card-pb .pbl,.light .card-pb .pbv{color:#B45309}
+.card-pb.empty{background:var(--card);border-color:var(--border);opacity:.6}
+.card-pb.empty .pbl,.card-pb.empty .pbv{color:var(--muted)}
+</style>
+<style id="ui-scale">
+/* ===== Skala tampilan: default 80%, pilihan 80/90/100 (atribut data-scale di <html>) ===== */
+html{--ui-s:.8;font-size:calc(var(--ui-s) * 100%)}
+html[data-scale="90"]{--ui-s:.9}
+html[data-scale="100"]{--ui-s:1}
+/* ukuran px ikut diskalakan (minimal 9px biar tetap kebaca) */
+html .input,html .btn{font-size:max(9px,calc(13px * var(--ui-s)))}
+html .badge{font-size:max(9px,calc(12px * var(--ui-s)))}
+html .icon-grad{font-size:max(9px,calc(14px * var(--ui-s)))}
+html .text-\[10px\]{font-size:max(9px,calc(10px * var(--ui-s)))}
+html .text-\[11px\]{font-size:max(9px,calc(11px * var(--ui-s)))}
+html .text-\[12px\]{font-size:max(9px,calc(12px * var(--ui-s)))}
+html .text-\[13px\]{font-size:max(9px,calc(13px * var(--ui-s)))}
+html .text-\[14px\]{font-size:max(9px,calc(14px * var(--ui-s)))}
+html .text-\[15px\]{font-size:max(9px,calc(15px * var(--ui-s)))}
+html .text-\[17px\]{font-size:max(9px,calc(17px * var(--ui-s)))}
+html .text-\[20px\]{font-size:max(9px,calc(20px * var(--ui-s)))}
+</style>
+<style id="ui-styles">
+/* ===== Gaya UI (data-ui) — terpisah dari dark/light. Default = tanpa atribut ===== */
+/* transisi halus, aktif setelah halaman siap (biar ga kedip pas load) */
+html.ui-anim,html.ui-anim body{transition:background-color .3s ease,color .3s ease}
+html.ui-anim .card,html.ui-anim .btn,html.ui-anim .btn-icon,html.ui-anim .input,html.ui-anim .badge,html.ui-anim .glass{transition:background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease,border-radius .3s ease}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
+
+
+/* animasi modal (hanya untuk gaya non-default) */
+@keyframes uiFade{from{opacity:0}to{opacity:1}}
+@keyframes uiPop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+html[data-ui] .fixed.inset-0:not(.hidden){animation:uiFade .22s ease both}
+html[data-ui] .fixed.inset-0:not(.hidden)>.card{animation:uiPop .3s cubic-bezier(.2,.8,.2,1) both}
+
+/* ---------- GLASS ---------- */
+html.dark[data-ui="glass"]{--card:rgba(255,255,255,.06);--card-hover:rgba(255,255,255,.10);--border:rgba(255,255,255,.14);--border-strong:rgba(255,255,255,.28)}
+html.light[data-ui="glass"]{--card:rgba(255,255,255,.55);--card-hover:rgba(255,255,255,.75);--border:rgba(255,255,255,.85);--border-strong:#fff}
+html[data-ui="glass"] body,html[data-ui="neon"] body{background:transparent}
+html[data-ui="glass"] body::before,html[data-ui="neon"] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none}
+html.dark[data-ui="glass"] body::before{background:radial-gradient(45vmax 45vmax at 10% 6%,rgba(214,255,87,.30),transparent 62%),radial-gradient(50vmax 50vmax at 95% 24%,rgba(99,102,241,.34),transparent 62%),radial-gradient(55vmax 55vmax at 25% 98%,rgba(20,184,166,.28),transparent 62%)}
+html.light[data-ui="glass"] body::before{background:radial-gradient(45vmax 45vmax at 10% 6%,rgba(163,230,53,.45),transparent 62%),radial-gradient(50vmax 50vmax at 95% 24%,rgba(129,140,248,.38),transparent 62%),radial-gradient(55vmax 55vmax at 25% 98%,rgba(45,212,191,.34),transparent 62%)}
+html[data-ui="glass"] .card:not([class*="rounded-b"]){border-radius:18px}
+html.dark[data-ui="glass"] .card{box-shadow:0 10px 34px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.14)}
+html.light[data-ui="glass"] .card{box-shadow:0 10px 30px rgba(60,70,140,.12),inset 0 1px 0 #fff}
+html[data-ui="glass"] .card:not([class*="space-y-1.5"]){-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%)}
+html[data-ui="glass"] .glass{-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.18)}
+html[data-ui="glass"] .btn,html[data-ui="glass"] .btn-icon,html[data-ui="glass"] .input{border-radius:12px}
+html[data-ui="glass"] .btn-lime{box-shadow:0 6px 18px rgba(214,255,87,.30)}
+
+/* ---------- NEON ---------- */
+html.dark[data-ui="neon"]{--bg:#030503;--card:#0A0D08;--card-hover:#10150C;--border:rgba(214,255,87,.20);--border-strong:rgba(214,255,87,.50);--lime-soft:rgba(214,255,87,.12)}
+html.light[data-ui="neon"]{--bg:#F3F7EA;--card:#FFFFFF;--card-hover:#F7FBEF;--border:rgba(101,163,13,.30);--border-strong:rgba(101,163,13,.65);--lime-soft:rgba(101,163,13,.13)}
+html[data-ui="neon"] body::before{background-size:30px 30px;-webkit-mask-image:linear-gradient(#000 0,transparent 70%);mask-image:linear-gradient(#000 0,transparent 70%)}
+html.dark[data-ui="neon"] body::before{background-image:linear-gradient(rgba(214,255,87,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(214,255,87,.07) 1px,transparent 1px)}
+html.light[data-ui="neon"] body::before{background-image:linear-gradient(rgba(101,163,13,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(101,163,13,.10) 1px,transparent 1px)}
+html[data-ui="neon"] .card:not([class*="rounded-b"]){border-radius:6px}
+html.dark[data-ui="neon"] .card{box-shadow:0 0 0 1px rgba(214,255,87,.05),0 0 22px -8px rgba(214,255,87,.38)}
+html.light[data-ui="neon"] .card{box-shadow:0 0 18px -8px rgba(101,163,13,.40)}
+html[data-ui="neon"] .glass{border-radius:8px;border-color:var(--border-strong);box-shadow:0 0 24px -8px var(--lime)}
+html[data-ui="neon"] .btn,html[data-ui="neon"] .btn-icon,html[data-ui="neon"] .input{border-radius:6px}
+html[data-ui="neon"] .btn:hover,html[data-ui="neon"] .btn-icon:hover{border-color:var(--lime);box-shadow:0 0 12px -3px var(--lime)}
+html[data-ui="neon"] .btn.on{box-shadow:0 0 12px -3px var(--lime)}
+html[data-ui="neon"] .btn-lime{box-shadow:0 0 16px -2px var(--lime)}
+html.dark[data-ui="neon"] .mono{text-shadow:0 0 8px rgba(214,255,87,.35)}
+
+/* ---------- SOFT ---------- */
+html.dark[data-ui="soft"]{--bg:#141417;--card:#1B1B20;--card-hover:#212127;--border:rgba(255,255,255,.05);--border-strong:rgba(255,255,255,.10)}
+html.light[data-ui="soft"]{--bg:#E4E8EF;--card:#ECEFF5;--card-hover:#F2F4F9;--border:rgba(0,0,0,.05);--border-strong:rgba(0,0,0,.10)}
+html[data-ui="soft"] .card,html[data-ui="soft"] .btn,html[data-ui="soft"] .btn-icon{border-color:transparent}
+html[data-ui="soft"] .card:not([class*="rounded-b"]){border-radius:22px}
+html[data-ui="soft"] .glass{border-radius:20px;border-color:transparent}
+html[data-ui="soft"] .btn,html[data-ui="soft"] .btn-icon,html[data-ui="soft"] .input{border-radius:14px}
+html.dark[data-ui="soft"] .card,html.dark[data-ui="soft"] .glass{box-shadow:8px 8px 20px rgba(0,0,0,.5),-6px -6px 16px rgba(255,255,255,.035)}
+html.light[data-ui="soft"] .card,html.light[data-ui="soft"] .glass{box-shadow:8px 8px 20px rgba(163,177,198,.55),-8px -8px 20px rgba(255,255,255,.9)}
+html.dark[data-ui="soft"] .btn,html.dark[data-ui="soft"] .btn-icon{box-shadow:4px 4px 10px rgba(0,0,0,.45),-3px -3px 8px rgba(255,255,255,.035)}
+html.light[data-ui="soft"] .btn,html.light[data-ui="soft"] .btn-icon{box-shadow:4px 4px 10px rgba(163,177,198,.5),-4px -4px 10px rgba(255,255,255,.9)}
+html.dark[data-ui="soft"] .btn:active,html.dark[data-ui="soft"] .btn.on,html.dark[data-ui="soft"] .input{box-shadow:inset 3px 3px 8px rgba(0,0,0,.5),inset -3px -3px 8px rgba(255,255,255,.03)}
+html.light[data-ui="soft"] .btn:active,html.light[data-ui="soft"] .btn.on,html.light[data-ui="soft"] .input{box-shadow:inset 3px 3px 8px rgba(163,177,198,.6),inset -3px -3px 8px rgba(255,255,255,.9)}
+html[data-ui="soft"] .btn-lime{box-shadow:0 6px 16px -4px var(--lime)}
+
+html.auth-on #app{display:none}
+#uiMenu:not(.hidden),#acctMenu:not(.hidden){animation:uiPop .22s cubic-bezier(.2,.8,.2,1) both}
+@media (prefers-reduced-motion:reduce){#uiMenu,#acctMenu,html[data-ui] .fixed.inset-0,html[data-ui] .fixed.inset-0>.card{animation:none!important}html.ui-anim *{transition:none!important}}
+</style>
+</head>
+<body class="w-full overflow-x-hidden">
+<div id="auth" class="hidden fixed inset-0 overflow-auto flex p-4" style="z-index:55"></div>
+<div id="pwM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50" onclick="if(event.target===this)this.classList.add('hidden')"></div>
+<div id="acctMenu" class="card hidden p-3 space-y-2" style="position:fixed;z-index:60;right:12px;width:min(240px,calc(100vw - 24px))"></div>
+
+<div id="app" class="w-full max-w-[1440px] mx-auto p-2.5 space-y-2.5 overflow-x-hidden">
+  <div class="glass sticky top-2 z-20 rounded-xl px-2.5 h-12 flex items-center justify-between w-full">
+    <div class="min-w-0"><div class="text-[15px] sm:text-[16px] font-bold leading-tight truncate">Log Run</div></div>
+    <div class="flex items-center gap-1"><button id="themeToggle" class="btn-icon">🌗</button><button id="uiToggle" class="btn-icon" title="Tampilan: gaya &amp; ukuran">🎨</button><button class="btn-icon hidden sm:flex" onclick="expCsv()" title="CSV">◧</button><button class="btn-icon" onclick="load()" title="Muat ulang">↻</button><button id="acctBtn" class="btn max-w-[120px] truncate" title="Akun"></button></div>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-[150px_170px_1fr] gap-2 w-full">
+    <select id="fd" class="input h-8 text-[13px]"><option value="all">Semua jarak</option><option value="lt_49">< 5K</option><option value="5k">5K</option><option value="mid">5K - 10 km</option><option value="gt10">> 10 km</option></select>
+    <select id="ft" class="input h-8 text-[13px]"><option value="all">Semua waktu</option><option value="this_week">Minggu ini</option><option value="last_week">Minggu lalu</option><option value="this_month">Bulan ini</option><option value="last_month">Bulan lalu</option><option value="this_year">Tahun ini</option><option value="last_year">Tahun kemarin</option><optgroup id="ftm" label="Per bulan"></optgroup></select>
+    <div class="col-span-2 sm:col-span-1 flex gap-2 w-full"><input id="q" placeholder="Cari tanggal, catatan…" class="input h-8 text-[13px] flex-1" oninput="renderTable()"><button class="btn h-8 shrink-0 whitespace-nowrap" onclick="openShare()">🖼 Story</button></div>
+  </div>
+  <p id="msg" class="text-[13px] text-amber-400 min-h-[12px] px-1"></p>
+  <div id="stats" class="grid grid-cols-3 lg:grid-cols-6 gap-1.5 w-full"></div>
+  <div id="pb" class="grid grid-cols-6 lg:grid-cols-5 gap-1.5 w-full"></div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-1.5 w-full">
+    <div class="card p-2"><div class="text-[12px] font-bold tracking-widest uppercase opacity-50 mb-2">Jarak / sesi</div><div class="h-[150px]"><canvas id="c1"></canvas></div></div>
+    <div class="card p-2"><div class="text-[12px] font-bold tracking-widest uppercase opacity-50 mb-2">Pace</div><div class="h-[150px]"><canvas id="c2"></canvas></div></div>
+    <div class="card p-2"><div class="text-[12px] font-bold tracking-widest uppercase opacity-50 mb-2">Heart rate</div><div class="h-[150px]"><canvas id="c3"></canvas></div></div>
+    <div class="card p-2"><div class="text-[12px] font-bold tracking-widest uppercase opacity-50 mb-2">Cadence</div><div class="h-[150px]"><canvas id="c4"></canvas></div></div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 w-full">
+    <div class="card p-2 lg:col-span-2"><div class="text-[12px] font-bold tracking-widest uppercase opacity-50 mb-2">Volume bulanan</div><div class="h-[150px]"><canvas id="c5"></canvas></div></div>
+    <div class="card p-2" id="kat"></div>
+  </div>
+  
+  <div class="adm hidden card p-2.5 space-y-2 w-full">
+    <textarea id="kal" rows="2" placeholder="Lari tgl 27 Agu 2026, jarak 5.19 km, waktu 40:13, pace 7:45..." class="input !h-auto py-2 resize-none"></textarea>
+    <div class="flex gap-1.5"><button class="btn btn-lime h-7" onclick="auto()">Auto-isi</button><button class="btn h-7" onclick="openForm()">+ Manual</button><button class="btn h-7" onclick="pasteAuto()">📋 Paste</button></div>
+  </div>
+
+  <!-- Desktop table -->
+  <div class="hidden lg:block card overflow-x-auto p-0 w-full">
+    <table class="w-full text-[13px] whitespace-nowrap"><thead class="text-[12px] uppercase tracking-widest opacity-50 border-b" style="border-color:var(--border)"><tr><th class="p-2 font-medium">Tanggal</th><th class="p-2 font-medium">Kategori</th><th class="p-2 font-medium">Jarak</th><th class="p-2 font-medium">Waktu</th><th class="p-2 font-medium">Pace</th><th class="p-2 font-medium">HR</th><th class="p-2 font-medium">Cad</th><th class="p-2 font-medium">VO2</th><th class="p-2 font-medium">Catatan</th><th class="adm hidden p-2">Aksi</th></tr></thead><tbody id="tb"></tbody></table>
+  </div>
+  <!-- Mobile cards -->
+  <div class="lg:hidden space-y-2 w-full" id="tbCards"></div>
+
+  <div class="card p-2 w-full overflow-x-auto"><div class="text-[12px] font-bold tracking-widest uppercase opacity-50 mb-2">Riwayat PB</div><table class="w-full text-[13px] text-left"><thead class="text-[12px] uppercase opacity-50 border-b" style="border-color:var(--border)"><tr><th class="p-2">Tanggal</th><th class="p-2">PB</th><th class="p-2">Jarak</th><th class="p-2">Waktu</th><th class="p-2">Pace</th></tr></thead><tbody id="pbh"></tbody></table></div>
+  <div class="text-center py-2 text-[12px] opacity-30">© 2026 R5K° • Project 5K</div>
+</div>
+
+<div id="pbM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50" onclick="if(event.target===this)this.classList.add('hidden')"><div class="card w-full max-w-[520px] p-4 space-y-3 max-h-[85vh] overflow-auto rounded-b-none sm:rounded-b-[12px]"><div class="flex items-center justify-between"><b id="pbT" class="text-[15px] font-bold"></b><button class="btn-icon" onclick="$('pbM').classList.add('hidden')">&times;</button></div><div id="pbB"></div></div></div>
+
+<div id="modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 z-50">
+  <div class="card max-w-[520px] w-full p-4 space-y-3 max-h-[90vh] overflow-auto"><b id="mt" class="text-[15px] font-bold"></b><div id="ff" class="grid grid-cols-2 gap-2"></div><div class="flex gap-2 justify-end pt-2"><button class="btn" onclick="$('modal').classList.add('hidden')">Batal</button><button id="sv" class="btn btn-lime" onclick="save()">Simpan</button></div></div>
+</div>
+
+<div id="shM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="card w-full max-w-[520px] p-4 space-y-3 max-h-[92vh] overflow-auto rounded-b-none sm:rounded-b-[12px]">
+    <div class="flex items-center justify-between"><b class="text-[15px] font-bold">🖼 Gambar story</b><button class="btn-icon" onclick="$('shM').classList.add('hidden')">✕</button></div>
+    <select id="shS" class="input h-8" onchange="shDraw()"></select>
+    <div id="shW" class="chk rounded-xl p-2 flex justify-center"><canvas id="shC" style="max-width:100%;max-height:38vh"></canvas></div>
+    <div class="flex items-center justify-between text-[12px] opacity-70"><span>Latar preview</span><button class="btn !py-1" onclick="shBg()"><span id="shBgL">Kotak-kotak</span></button></div>
+    <div><div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1">Template</div><div id="shTpl" class="grid grid-cols-2 gap-2"></div></div>
+    <div><div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1">Gaya</div><div class="grid grid-cols-2 gap-2"><button class="btn on" data-g="st" data-v="white" onclick="shSet('st','white')">Putih</button><button class="btn" data-g="st" data-v="black" onclick="shSet('st','black')">Hitam</button><button class="btn" data-g="st" data-v="wob" onclick="shSet('st','wob')">Putih • outline hitam</button><button class="btn" data-g="st" data-v="bow" onclick="shSet('st','bow')">Hitam • outline putih</button></div></div>
+    <div><div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1">Ekspor</div><div class="grid grid-cols-2 gap-2"><button class="btn on" data-g="mode" data-v="tight" onclick="shSet('mode','tight')">Potong presisi</button><button class="btn" data-g="mode" data-v="full" onclick="shSet('mode','full')">Full portrait 9:16</button></div></div>
+    <div id="shYW" class="hidden"><div class="flex justify-between text-[12px] opacity-70 mb-1"><span>Posisi (jarak dari bawah)</span><span id="shYL">440 px</span></div><input id="shY" type="range" min="300" max="700" step="10" value="440" class="w-full" oninput="shDraw()"></div>
+    <div class="flex gap-2"><button class="btn flex-1" onclick="shDl()">Unduh PNG</button><button class="btn btn-lime flex-1" onclick="shShare()">Share</button></div>
+  </div>
+</div>
+
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(function(e){console.warn("SW gagal",e)})})}</script>
+<div id="uiMenu" class="card hidden p-3 space-y-3" style="position:fixed;z-index:60;right:12px;width:min(260px,calc(100vw - 24px))">
+  <div><div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1.5">Gaya</div><div id="uiStyles" class="grid grid-cols-2 gap-1.5"></div></div>
+  <div><div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1.5">Ukuran</div><div id="uiScales" class="grid grid-cols-3 gap-1.5"></div></div>
+</div>
+<script src="./story-logo.js?v=1"></script>
+<script src="./story.js?v=1"></script>
+<script src="./auth.js?v=1"></script>
+<script src="./logic.js?v=8"></script>
+</body>
+</html>
