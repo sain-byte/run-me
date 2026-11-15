@@ -78,7 +78,7 @@ function authShow(msg) {
   A.pass = ''; A.cd = 0;
   document.documentElement.classList.add('auth-on');
   $('auth').classList.remove('hidden');
-  $('acctMenu').classList.add('hidden'); $('pwM').classList.add('hidden');
+  $('acctMenu').classList.add('hidden'); $('pwM').classList.add('hidden'); if ($('acctModal')) $('acctModal').classList.add('hidden');
   authView('login', msg ? {t: 'info', m: msg} : null);
 }
 
@@ -182,22 +182,14 @@ const ACT = {
   }
 };
 
-// ---------- menu akun (tombol username di header) + ganti password ----------
-function acctPlace() { $('acctMenu').style.top = Math.round($('acctBtn').getBoundingClientRect().bottom + 8) + 'px'; }
-function acctClose() { $('acctMenu').classList.add('hidden'); }
+// ---------- account center + pengaturan akun ----------
+function acctClose() { const m = $('acctModal'); if (m) m.classList.add('hidden'); }
 function acctOpen() {
   const u = S.user || {};
-  const nm = (typeof PF !== 'undefined' && PF.data && PF.data.namaLengkap) || '';   // profil (profile.js), boleh belum ada
-  const av = typeof avatarHtml === 'function' ? avatarHtml(40) : '';
-  $('acctMenu').innerHTML =
-    '<div class="flex items-center gap-2.5 mb-1">' + av + '<div class="min-w-0">' +
-    `<div class="text-[13px] font-semibold truncate">${esc(nm || u.username)}</div>` +
-    (nm ? `<div class="text-[12px] opacity-70 truncate">@${esc(u.username)}</div>` : '') +
-    `<div class="text-[12px] opacity-60 truncate">${esc(u.email)}</div></div></div>` +
-    '<button class="btn w-full" data-acct="profile">Profil</button>' +
-    '<button class="btn w-full" data-acct="pw">Ganti password</button>' +
-    '<button class="btn w-full" data-acct="out">Keluar</button>';
-  acctPlace(); $('acctMenu').classList.remove('hidden');
+  const nm = (typeof PF !== 'undefined' && PF.data && PF.data.namaLengkap) || '';
+  const av = typeof avatarHtml === 'function' ? avatarHtml(54, true) : '';
+  $('acctSettingsBody').innerHTML = `<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--lime-soft)">${av}<div class="min-w-0"><div class="font-bold truncate">${esc(nm || u.username || 'Akun')}</div><div class="text-[12px] opacity-65 truncate">@${esc(u.username || '')}</div><div class="text-[12px] opacity-60 truncate">${esc(u.email || '')}</div></div></div><button class="btn w-full h-11 flex items-center justify-center gap-2" data-acct="pw"><span>🔒</span> Ganti password</button><button class="btn w-full h-11 flex items-center justify-center gap-2" data-acct="out"><span>↪</span> Keluar dari akun</button><p class="text-[11px] text-center opacity-40">Sesi perangkat ini akan diakhiri saat keluar</p>`;
+  const m=$('acctModal'); m.classList.remove('hidden'); m.classList.add('flex');
 }
 
 function pwMsg(t, m) {
@@ -207,7 +199,7 @@ function pwMsg(t, m) {
 }
 function pwClose() { $('pwM').classList.add('hidden'); $('pwM').innerHTML = ''; }
 function pwOpen() {
-  $('pwM').innerHTML = '<div class="card max-w-[360px] w-full p-5 space-y-3.5">' +
+  $('pwM').innerHTML = '<div class="card modal-panel max-w-[390px] w-full p-5 space-y-3.5 rounded-2xl">' +
     '<div><h1 class="text-[20px] font-bold leading-none">Ganti password</h1><p class="text-[13px] opacity-60 mt-1">Perangkat lain akan otomatis keluar</p></div>' +
     aPass('pOld', 'Password lama', 'current-password') + aPass('pNew', 'Password baru (min. 8 karakter)', 'new-password') + aPass('pNew2', 'Ulangi password baru', 'new-password') +
     '<p id="pMsg" class="text-[13px] min-h-[18px]"></p>' +
@@ -256,15 +248,11 @@ function authInit() {
     if (b.dataset.pw === 'save') pwSave(); else pwClose();
   });
 
-  const btn = $('acctBtn'), menu = $('acctMenu');
-  if (btn) btn.onclick = e => { e.stopPropagation(); if (menu.classList.contains('hidden')) acctOpen(); else acctClose(); };
-  menu.addEventListener('click', e => {
-    const b = e.target.closest && e.target.closest('[data-acct]'); if (!b) return;
-    acctClose();
-    if (b.dataset.acct === 'profile') { if (typeof profileOpen === 'function') profileOpen(); }
-    else if (b.dataset.acct === 'pw') pwOpen(); else logout();
+  const btn = $('acctBtn'), menu = $('acctMenu'), settings = $('acctModal');
+  if (btn) btn.onclick = e => { e.stopPropagation(); if (typeof profileOpen === 'function') profileOpen(); };
+  if (settings) settings.addEventListener('click', e => {
+    const b=e.target.closest && e.target.closest('[data-acct]'); if(!b) return;
+    acctClose(); if(b.dataset.acct==='pw') pwOpen(); else if(b.dataset.acct==='out') logout();
   });
-  document.addEventListener('pointerdown', e => { if (!menu.classList.contains('hidden') && !menu.contains(e.target) && !(btn && btn.contains(e.target))) acctClose(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { acctClose(); if (!$('pwM').classList.contains('hidden')) pwClose(); } });
-  window.addEventListener('resize', () => { if (!menu.classList.contains('hidden')) acctPlace(); });
 }

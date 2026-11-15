@@ -74,7 +74,7 @@ async function profileLoad() {
 function profileReset() { pfCropClose(); PF.data = null; PF.photo = ''; const m = $('prM'); if (m) { m.classList.add('hidden'); m.innerHTML = ''; } }
 
 // ---------- tampilan modal ----------
-const pfLab = t => '<div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1">' + t + '</div>';
+const pfLab = t => '<div class="text-[12px] tracking-wide opacity-60 font-semibold mb-1">' + t + '</div>';
 const pfIn = (id, label, val, extra) => '<div>' + pfLab(label) + '<input id="' + id + '" class="input" value="' + esc(val || '') + '" autocapitalize="none" autocorrect="off" spellcheck="false" ' + (extra || '') + '></div>';
 
 function pfMsg(t, m) {
@@ -90,7 +90,7 @@ function pfPhotoMsg(t, m) {
 
 function pfFormHtml() {
   const p = PF.data || {};
-  const links = pfLinks(p).map(l => '<a href="' + l[1] + '" target="_blank" rel="noopener noreferrer" class="btn h-7">' + l[0] + '</a>').join('');
+  const links = pfLinks(p).map(l => '<a href="' + l[1] + '" target="_blank" rel="noopener noreferrer" class="btn h-8 flex items-center justify-center min-w-0 text-center">' + l[0] + '</a>').join('');
   return '<div class="flex items-center justify-between"><h1 class="text-[20px] font-bold leading-none">Profil</h1><button type="button" class="btn-icon" data-pf="close" title="Tutup">✕</button></div>' +
     '<div class="flex items-center gap-3"><div id="pfAv" class="shrink-0">' + avatarHtml(80, true) + '</div>' +
     '<div class="flex flex-col gap-1.5"><button type="button" class="btn h-8" data-pf="pick">' + (p.hasPhoto ? 'Ganti foto' : 'Pilih foto') + '</button>' +
@@ -105,7 +105,7 @@ function pfFormHtml() {
     pfIn('pfTt', 'TikTok', p.tiktok, 'placeholder="username (tanpa @)"') +
     pfIn('pfFb', 'Facebook', p.facebook, 'placeholder="username atau link profil"') +
     pfIn('pfWa', 'WhatsApp', p.whatsapp, 'type="tel" inputmode="tel" placeholder="contoh 0812xxxxxxxx"') +
-    (links ? '<div>' + pfLab('Tautan') + '<div class="flex flex-wrap gap-1.5">' + links + '</div></div>' : '') +
+    (links ? '<div>' + pfLab('Tautan') + '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">' + links + '</div></div>' : '') +
     '<p id="pfMsg" class="text-[13px] min-h-[18px]"></p>' +
     '<div class="flex gap-2"><button type="button" class="btn flex-1 h-9" data-pf="close">Tutup</button><button type="button" id="pfSave" class="btn btn-lime flex-1 h-9" data-pf="save">Simpan</button></div>';
 }
@@ -116,6 +116,21 @@ function pfCropHtml() {
     '<input id="pfZoom" type="range" min="1" max="3" step="0.01" value="' + PF.crop.zoom + '" class="w-full">' +
     '<p id="pfMsg" class="text-[13px] min-h-[18px]"></p>' +
     '<div class="flex gap-2"><button type="button" class="btn flex-1 h-9" data-pf="cropcancel">Batal</button><button type="button" id="pfUse" class="btn btn-lime flex-1 h-9" data-pf="cropuse">Pakai foto</button></div>';
+}
+
+function pfDetailView() {
+  const p=PF.data||{}, u=S.user||{}, links=pfLinks(p);
+  const av=avatarHtml(92,true);
+  const row=(icon,label,value)=>value?`<div class="profile-info-row"><span class="profile-info-icon" aria-hidden="true">${icon}</span><div class="min-w-0 flex-1"><div class="text-[10px] uppercase tracking-wider opacity-45">${label}</div><div class="text-[13px] mt-0.5 break-words">${esc(value)}</div></div></div>`:'';
+  const linkHtml=links.map(([name,url])=>`<a class="btn flex-1 text-center" href="${url}" target="_blank" rel="noopener noreferrer">↗ ${name}</a>`).join('');
+  $('prM').innerHTML='<div class="card modal-panel max-w-[460px] w-full p-4 sm:p-5 space-y-4 m-auto">'+
+    '<div class="flex items-center justify-between"><div><div class="text-[10px] uppercase tracking-[.18em] opacity-50">Account profile</div><h2 class="text-xl font-bold">Biodata</h2></div><button class="btn-icon" data-pf="close" aria-label="Tutup">✕</button></div>'+
+    '<div class="flex items-center gap-3 p-3 rounded-2xl" style="background:var(--lime-soft)"><button type="button" id="pfDetailAvatar" class="rounded-full overflow-hidden shrink-0 ring-2 ring-white/20" title="Lihat foto">'+av+'</button><div class="min-w-0"><div class="font-bold text-[16px] truncate">'+esc(p.namaLengkap||u.username||'Pengguna')+'</div><div class="text-[12px] opacity-65">@'+esc(u.username||'')+'</div><div class="text-[12px] opacity-60 truncate">'+esc(u.email||'')+'</div></div></div>'+
+    '<div class="profile-info-list">'+row('▦','Tanggal lahir',pfTglIndo(p.tglLahir))+row('⚥','Jenis kelamin',p.gender)+row('♡','Hobi',p.hobi)+row('☰','Bio singkat',p.bio)+'</div>'+
+    (linkHtml?'<div><div class="text-[10px] uppercase tracking-wider opacity-45 mb-2">Tautan</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2">'+linkHtml+'</div></div>':'<div class="text-[12px] opacity-45">Belum ada tautan sosial</div>')+
+    '<div class="grid grid-cols-2 gap-2 pt-1"><button class="btn btn-lime h-11 flex items-center justify-center gap-2" data-pf="edit">✎ Edit profil</button><button class="btn h-11 flex items-center justify-center gap-2" data-open-settings>⚙ Setting akun</button></div></div>';
+  const avBtn=$('pfDetailAvatar'); if(avBtn) avBtn.onclick=()=>{const src=pfSafe(PF.photo,PF_JPEG)||pfSafe(p.thumb,PF_JPEG);if(src){$('photoViewImg').src=src;$('photoView').classList.remove('hidden');$('photoView').classList.add('flex');}};
+  const setBtn=$('prM').querySelector('[data-open-settings]'); if(setBtn)setBtn.onclick=()=>{profileClose();acctOpen();};
 }
 
 function pfView() {
@@ -137,12 +152,12 @@ async function profileOpen() {
       return;
     }
   }
-  pfView();
+  pfDetailView();
   if (PF.data.hasPhoto && !PF.photo) {   // foto HD dimuat belakangan, thumbnail tampil dulu
     const t = S.token;
     try {
       const j = await api('photo');
-      if (t === S.token && j.photo) { PF.photo = j.photo; const av = $('pfAv'); if (av && !PF.crop) av.innerHTML = avatarHtml(80, true); }
+      if (t === S.token && j.photo) { PF.photo = j.photo; const av = $('pfAv'); if (av && !PF.crop) av.innerHTML = avatarHtml(80, true); if (!$('prM').classList.contains('hidden')) pfDetailView(); }
     } catch (e) { /* tetap thumbnail */ }
   }
 }
@@ -172,7 +187,7 @@ async function pfSave() {
   try {
     const j = await api('profileSave', {fields: f});
     PF.data = Object.assign({}, PF.data, j.profile);   // thumbnail dari server ikut diperbarui
-    pfView(); pfMsg('ok', 'Profil tersimpan');          // tampilkan nilai yang sudah dirapikan server (@ dibuang, 08xx jadi 62xx, dst)
+    pfDetailView();          // tampilkan nilai yang sudah dirapikan server (@ dibuang, 08xx jadi 62xx, dst)
   } catch (e) {
     if (e.code !== 'UNAUTHORIZED') { pfMsg('err', e.message || 'Gagal menyimpan'); if (b) b.disabled = false; }
   }
@@ -255,7 +270,7 @@ async function pfCropUse() {
     const o = pfCropExport();
     if (!/^data:image\/jpeg/.test(o.photo)) throw new Error('Browser ini tidak bisa membuat JPEG');
     await pfUpload(o.photo, o.thumb);
-    pfCropClose(); pfView(); pfPhotoMsg('ok', 'Foto tersimpan');
+    pfCropClose(); pfDetailView();
   } catch (e) {
     if (e.code === 'UNAUTHORIZED') return;
     pfMsg('err', e.message || 'Gagal mengunggah foto');
@@ -268,12 +283,13 @@ async function pfDelPhoto() {
   try {
     await api('photoDel');
     PF.data = Object.assign({}, PF.data, {thumb: '', hasPhoto: false}); PF.photo = '';
-    avatarPaint(); pfView(); pfPhotoMsg('ok', 'Foto dihapus');
+    avatarPaint(); pfDetailView();
   } catch (e) { if (e.code !== 'UNAUTHORIZED') pfPhotoMsg('err', e.message || 'Gagal menghapus foto'); }
 }
 
 const PFACT = {
   close: profileClose,
+  edit: pfView,
   save: pfSave,
   pick: () => { const f = $('pfFile'); if (f) f.click(); },
   delphoto: pfDelPhoto,

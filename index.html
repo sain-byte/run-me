@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
 <meta charset="utf-8">
-<script>try{var _d=document.documentElement,_u=localStorage.getItem("ui"),_z=localStorage.getItem("uiScale");if(_u&&_u!=="default")_d.setAttribute("data-ui",_u);if(_z==="90"||_z==="100")_d.setAttribute("data-scale",_z)}catch(e){}</script>
+<script>try{var _d=document.documentElement,_u=localStorage.getItem("ui"),_z=localStorage.getItem("uiScale");if(_u&&_u!=="default")_d.setAttribute("data-ui",_u);if(["80","85","90","95","100"].includes(_z))_d.setAttribute("data-scale",_z)}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Log Run</title>
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -44,7 +43,9 @@ html, body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; background:
 <style id="ui-scale">
 /* ===== Skala tampilan: default 80%, pilihan 80/90/100 (atribut data-scale di <html>) ===== */
 html{--ui-s:.8;font-size:calc(var(--ui-s) * 100%)}
+html[data-scale="85"]{--ui-s:.85}
 html[data-scale="90"]{--ui-s:.9}
+html[data-scale="95"]{--ui-s:.95}
 html[data-scale="100"]{--ui-s:1}
 /* ukuran px ikut diskalakan (minimal 9px biar tetap kebaca) */
 html .input,html .btn{font-size:max(9px,calc(13px * var(--ui-s)))}
@@ -122,19 +123,71 @@ html[data-ui="soft"] .btn-lime{box-shadow:0 6px 16px -4px var(--lime)}
 html.auth-on #app{display:none}
 #uiMenu:not(.hidden),#acctMenu:not(.hidden){animation:uiPop .22s cubic-bezier(.2,.8,.2,1) both}
 @media (prefers-reduced-motion:reduce){#uiMenu,#acctMenu,html[data-ui] .fixed.inset-0,html[data-ui] .fixed.inset-0>.card{animation:none!important}html.ui-anim *{transition:none!important}}
+
+/* ===== Log Run premium responsive refinements ===== */
+#app{padding-bottom:max(14px,env(safe-area-inset-bottom))}
+#pbM,#shM,#modal,#pwM,#prM,#acctMenu{z-index:70}
+#pbM,#shM{align-items:center!important;padding:14px}
+#pbM>.card,#shM>.card{border-radius:18px!important;width:min(100%,560px);max-height:min(88dvh,900px);overflow:auto;overscroll-behavior:contain}
+#prM,#pwM{align-items:center;justify-content:center}
+#prM>.card,#pwM>.card{margin:auto}
+#prM .card,#pwM .card{border-radius:20px}
+#acctMenu{display:none}
+#acctMenu:not(.hidden){display:block}
+#kat [data-category]{cursor:pointer;transition:background .18s,border-color .18s}
+#kat [data-category]:active{transform:scale(.99)}
+.action-icon{width:34px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:10px;background:var(--card);font-size:15px}
+.action-icon:active{background:var(--lime-soft);border-color:var(--lime)}
+#tbCards .card{min-width:0}
+#tbCards .card .row-actions{display:flex;justify-content:flex-end;gap:7px;padding-top:5px}
+@media(max-width:639px){#app{padding-left:10px;padding-right:10px}#acctBtn{max-width:112px}#stats{gap:6px}#kat [data-category]{padding:5px 4px;border-radius:8px}#kal{min-height:62px}}
+/* ===== Header minimal: tanpa kotak tombol ===== */
+.app-header{padding:0 3px;background:transparent;border:0;box-shadow:none}
+.header-tools{gap:clamp(5px,1.8vw,12px)}
+.header-tool{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--text);border-radius:11px;font-size:18px;line-height:1;opacity:.82;transition:background .18s,color .18s,opacity .18s,transform .18s}
+.header-tool:hover,.header-tool:focus-visible{background:var(--lime-soft);color:var(--lime);opacity:1;outline:none}
+.header-tool:active{transform:scale(.92)}
+.header-account{min-width:34px;max-width:126px;min-height:36px;display:inline-flex;align-items:center;justify-content:flex-end;padding:2px 0 2px 5px;border:0;background:transparent;color:var(--text);border-radius:12px;font-size:13px;font-weight:650}
+.header-account:hover{opacity:.82}
+.header-account img,.header-account>span>img{width:29px!important;height:29px!important;border-radius:50%;outline:2px solid var(--lime-soft)}
+.header-account .truncate{max-width:76px}
+@media(max-width:380px){.header-tools{gap:3px}.header-tool{width:30px;height:32px;font-size:16px}.header-account{max-width:34px}.header-account .truncate{display:none}}
+
+@media(prefers-reduced-motion:no-preference){.modal-panel{animation:modalIn .22s cubic-bezier(.2,.8,.2,1) both}@keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}}
+</style>
+<style id="profile-row-styles">
+/* Profil: biodata berbentuk baris dengan ikon, tautan selalu rata */
+.profile-info-list{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:14px;padding:2px 12px;background:color-mix(in srgb,var(--card) 76%,transparent)}
+.profile-info-row{display:flex;align-items:center;gap:11px;min-width:0;padding:10px 0;border-bottom:1px solid var(--border)}
+.profile-info-row:last-child{border-bottom:0}
+.profile-info-icon{width:30px;height:30px;flex:0 0 30px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:var(--lime-soft);color:var(--lime);font-size:16px;font-weight:700}
 </style>
 </head>
 <body class="w-full overflow-x-hidden">
 <div id="auth" class="hidden fixed inset-0 overflow-auto flex p-4" style="z-index:55"></div>
-<div id="pwM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50" onclick="if(event.target===this)this.classList.add('hidden')"></div>
-<div id="prM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex overflow-auto p-4 z-50" onclick="if(event.target===this)profileBackdrop()"></div>
-<div id="acctMenu" class="card hidden p-3 space-y-2" style="position:fixed;z-index:60;right:12px;width:min(240px,calc(100vw - 24px))"></div>
+<div id="pwM" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-50" onclick="if(event.target===this)this.classList.add('hidden')"></div>
+<div id="prM" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center overflow-y-auto p-3 sm:p-5 z-50" onclick="if(event.target===this)profileBackdrop()"></div>
+<div id="acctMenu" class="hidden"></div>
+<div id="acctModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md items-center justify-center p-3 z-[80]" onclick="if(event.target===this)acctClose()"><div class="card modal-panel w-full max-w-[390px] p-4 sm:p-5 rounded-2xl space-y-4"><div class="flex items-center justify-between"><div><div class="text-[10px] uppercase tracking-[.18em] opacity-50">Account center</div><b class="text-lg">Pengaturan akun</b></div><button class="btn-icon" onclick="acctClose()">✕</button></div><div id="acctSettingsBody" class="space-y-2"></div></div></div>
+
+<div id="photoView" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-5 z-[90]" onclick="this.classList.add('hidden')"><img id="photoViewImg" class="max-w-full max-h-[85dvh] object-contain rounded-2xl shadow-2xl" alt="Foto profil"></div>
+<div id="categoryM" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 z-[75]" onclick="if(event.target===this)this.classList.add('hidden')"><div class="card modal-panel w-full max-w-[560px] max-h-[88dvh] overflow-y-auto p-4 sm:p-5 space-y-3 rounded-2xl"><div class="flex items-center justify-between gap-3"><div><div class="text-[10px] uppercase tracking-[.18em] opacity-50">Kategori aktivitas</div><b id="categoryTitle" class="text-lg"></b></div><button class="btn-icon" onclick="$('categoryM').classList.add('hidden')" aria-label="Tutup">✕</button></div><div id="categorySummary"></div><div id="categoryRows" class="space-y-2"></div></div></div>
+
 
 <div id="app" class="w-full max-w-[1440px] mx-auto p-2.5 space-y-2.5 overflow-x-hidden">
-  <div class="glass sticky top-2 z-20 rounded-xl px-2.5 h-12 flex items-center justify-between w-full">
-    <div class="min-w-0"><div class="text-[15px] sm:text-[16px] font-bold leading-tight truncate">Log Run</div></div>
-    <div class="flex items-center gap-1"><button id="themeToggle" class="btn-icon">🌗</button><button id="uiToggle" class="btn-icon" title="Tampilan: gaya &amp; ukuran">🎨</button><button class="btn-icon hidden sm:flex" onclick="expCsv()" title="CSV">◧</button><button class="btn-icon" onclick="load()" title="Muat ulang">↻</button><button id="acctBtn" class="btn max-w-[150px] truncate" title="Akun"></button></div>
-  </div>
+  <header class="app-header sticky top-0 z-20 h-12 flex items-center justify-between w-full">
+    <div class="min-w-0 flex items-center gap-2.5">
+      <img src="./android-chrome-192x192.png" alt="" class="w-7 h-7 rounded-lg object-cover shrink-0">
+      <div class="text-[16px] sm:text-[17px] font-bold tracking-tight leading-none truncate">Log Run</div>
+    </div>
+    <nav class="header-tools flex items-center gap-2" aria-label="Kontrol aplikasi">
+      <button id="themeToggle" class="header-tool" type="button" title="Ganti tema" aria-label="Ganti tema">🌗</button>
+      <button id="uiToggle" class="header-tool" type="button" title="Gaya dan ukuran tampilan" aria-label="Gaya dan ukuran tampilan">🎨</button>
+      <button class="header-tool hidden sm:inline-flex" type="button" onclick="expCsv()" title="Ekspor CSV" aria-label="Ekspor CSV">⇩</button>
+      <button class="header-tool" type="button" onclick="load()" title="Muat ulang" aria-label="Muat ulang">↻</button>
+      <button id="acctBtn" class="header-account" type="button" title="Profil akun" aria-label="Profil akun"></button>
+    </nav>
+  </header>
 
   <div class="grid grid-cols-2 sm:grid-cols-[150px_170px_1fr] gap-2 w-full">
     <select id="fd" class="input h-8 text-[13px]"><option value="all">Semua jarak</option><option value="lt_49">< 5K</option><option value="5k">5K</option><option value="mid">5K - 10 km</option><option value="gt10">> 10 km</option></select>
@@ -157,7 +210,7 @@ html.auth-on #app{display:none}
   
   <div class="adm hidden card p-2.5 space-y-2 w-full">
     <textarea id="kal" rows="2" placeholder="Lari tgl 27 Agu 2026, jarak 5.19 km, waktu 40:13, pace 7:45..." class="input !h-auto py-2 resize-none"></textarea>
-    <div class="flex gap-1.5"><button class="btn btn-lime h-7" onclick="auto()">Auto-isi</button><button class="btn h-7" onclick="openForm()">+ Manual</button><button class="btn h-7" onclick="pasteAuto()">📋 Paste</button></div>
+    <div class="grid grid-cols-3 gap-2"><button class="btn btn-lime h-9 flex items-center justify-center gap-1.5" onclick="auto()"><span>✦</span><span>Auto-isi</span></button><button class="btn h-9 flex items-center justify-center gap-1.5" onclick="openForm()"><span>＋</span><span>Manual</span></button><button class="btn h-9 flex items-center justify-center gap-1.5" onclick="pasteAuto()"><span>▣</span><span>Paste</span></button></div>
   </div>
 
   <!-- Desktop table -->
@@ -171,14 +224,14 @@ html.auth-on #app{display:none}
   <div class="text-center py-2 text-[12px] opacity-30">© 2026 R5K° • Project 5K</div>
 </div>
 
-<div id="pbM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50" onclick="if(event.target===this)this.classList.add('hidden')"><div class="card w-full max-w-[520px] p-4 space-y-3 max-h-[85vh] overflow-auto rounded-b-none sm:rounded-b-[12px]"><div class="flex items-center justify-between"><b id="pbT" class="text-[15px] font-bold"></b><button class="btn-icon" onclick="$('pbM').classList.add('hidden')">&times;</button></div><div id="pbB"></div></div></div>
+<div id="pbM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50" onclick="if(event.target===this)this.classList.add('hidden')"><div class="card modal-panel w-full max-w-[520px] p-4 space-y-3 max-h-[85dvh] overflow-auto rounded-xl"><div class="flex items-center justify-between"><b id="pbT" class="text-[15px] font-bold"></b><button class="btn-icon" onclick="$('pbM').classList.add('hidden')">&times;</button></div><div id="pbB"></div></div></div>
 
 <div id="modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 z-50">
   <div class="card max-w-[520px] w-full p-4 space-y-3 max-h-[90vh] overflow-auto"><b id="mt" class="text-[15px] font-bold"></b><div id="ff" class="grid grid-cols-2 gap-2"></div><div class="flex gap-2 justify-end pt-2"><button class="btn" onclick="$('modal').classList.add('hidden')">Batal</button><button id="sv" class="btn btn-lime" onclick="save()">Simpan</button></div></div>
 </div>
 
-<div id="shM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50" onclick="if(event.target===this)this.classList.add('hidden')">
-  <div class="card w-full max-w-[520px] p-4 space-y-3 max-h-[92vh] overflow-auto rounded-b-none sm:rounded-b-[12px]">
+<div id="shM" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="card modal-panel w-full max-w-[520px] p-4 space-y-3 max-h-[88dvh] overflow-auto rounded-xl">
     <div class="flex items-center justify-between"><b class="text-[15px] font-bold">🖼 Gambar story</b><button class="btn-icon" onclick="$('shM').classList.add('hidden')">✕</button></div>
     <select id="shS" class="input h-8" onchange="shDraw()"></select>
     <div id="shW" class="chk rounded-xl p-2 flex justify-center"><canvas id="shC" style="max-width:100%;max-height:38vh"></canvas></div>
@@ -194,12 +247,12 @@ html.auth-on #app{display:none}
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(function(e){console.warn("SW gagal",e)})})}</script>
 <div id="uiMenu" class="card hidden p-3 space-y-3" style="position:fixed;z-index:60;right:12px;width:min(260px,calc(100vw - 24px))">
   <div><div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1.5">Gaya</div><div id="uiStyles" class="grid grid-cols-2 gap-1.5"></div></div>
-  <div><div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1.5">Ukuran</div><div id="uiScales" class="grid grid-cols-3 gap-1.5"></div></div>
+  <div><div class="text-[11px] uppercase tracking-widest opacity-50 font-semibold mb-1.5">Ukuran</div><div id="uiScales" class="grid grid-cols-5 gap-1.5"></div></div>
 </div>
-<script src="./story-logo.js?v=1"></script>
-<script src="./story.js?v=1"></script>
-<script src="./auth.js?v=2"></script>
-<script src="./profile.js?v=1"></script>
-<script src="./logic.js?v=9"></script>
+<script src="./story-logo.js?v=2"></script>
+<script src="./story.js?v=2"></script>
+<script src="./auth.js?v=4"></script>
+<script src="./profile.js?v=4"></script>
+<script src="./logic.js?v=11"></script>
 </body>
 </html>
