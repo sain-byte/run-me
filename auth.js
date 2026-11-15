@@ -187,9 +187,14 @@ function acctPlace() { $('acctMenu').style.top = Math.round($('acctBtn').getBoun
 function acctClose() { $('acctMenu').classList.add('hidden'); }
 function acctOpen() {
   const u = S.user || {};
+  const nm = (typeof PF !== 'undefined' && PF.data && PF.data.namaLengkap) || '';   // profil (profile.js), boleh belum ada
+  const av = typeof avatarHtml === 'function' ? avatarHtml(40) : '';
   $('acctMenu').innerHTML =
-    `<div class="text-[13px] font-semibold truncate">${esc(u.username)}</div>` +
-    `<div class="text-[12px] opacity-60 truncate mb-1">${esc(u.email)}</div>` +
+    '<div class="flex items-center gap-2.5 mb-1">' + av + '<div class="min-w-0">' +
+    `<div class="text-[13px] font-semibold truncate">${esc(nm || u.username)}</div>` +
+    (nm ? `<div class="text-[12px] opacity-70 truncate">@${esc(u.username)}</div>` : '') +
+    `<div class="text-[12px] opacity-60 truncate">${esc(u.email)}</div></div></div>` +
+    '<button class="btn w-full" data-acct="profile">Profil</button>' +
     '<button class="btn w-full" data-acct="pw">Ganti password</button>' +
     '<button class="btn w-full" data-acct="out">Keluar</button>';
   acctPlace(); $('acctMenu').classList.remove('hidden');
@@ -256,7 +261,8 @@ function authInit() {
   menu.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('[data-acct]'); if (!b) return;
     acctClose();
-    if (b.dataset.acct === 'pw') pwOpen(); else logout();
+    if (b.dataset.acct === 'profile') { if (typeof profileOpen === 'function') profileOpen(); }
+    else if (b.dataset.acct === 'pw') pwOpen(); else logout();
   });
   document.addEventListener('pointerdown', e => { if (!menu.classList.contains('hidden') && !menu.contains(e.target) && !(btn && btn.contains(e.target))) acctClose(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { acctClose(); if (!$('pwM').classList.contains('hidden')) pwClose(); } });

@@ -1,4 +1,4 @@
-const API = 'https://script.google.com/macros/s/AKfycbwiRUSPDaaW_fcLyhRfvWK9K97wQnVFmz9Fw8jyo0HdSqVRwYA6Q52Tx42Kj4EeTgoV0w/exec'; // <- tempel URL web app (deployment BARU, berakhiran /exec) di sini
+const API = 'GANTI_URL_DEPLOYMENT_BARU'; // <- tempel URL web app (deployment BARU, berakhiran /exec) di sini
 const $ = id => document.getElementById(id);
 const MON = {jan:0,feb:1,mar:2,apr:3,mei:4,may:4,jun:5,jul:6,agu:7,ags:7,agt:7,aug:7,sep:8,okt:9,oct:9,nov:10,des:11,dec:11};
 const MID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
@@ -51,14 +51,15 @@ function setSess(token, expiresAt, user){
   LS.set('tk', token); LS.set('tkx', S.exp); if (S.user) LS.set('usr', JSON.stringify(S.user));
   S.target = loadTarget(); applyAuth();
 }
-function dropSess(){ S.token = ''; S.exp = 0; S.user = null; S.rows = []; ['tk', 'tkx', 'usr', 'rl', 'tkt'].forEach(LS.del); applyAuth(); }
+function dropSess(){ S.token = ''; S.exp = 0; S.user = null; S.rows = []; ['tk', 'tkx', 'usr', 'rl', 'tkt'].forEach(LS.del); if (typeof profileReset === 'function') profileReset(); applyAuth(); }
 
 function applyAuth(){
   const on = !!S.token;   // yang login = pemilik datanya sendiri (boleh tambah/edit/hapus)
   document.querySelectorAll('.adm').forEach(e => e.classList.toggle('hidden', !on));
-  const b = $('acctBtn'); if (b) b.textContent = S.user ? S.user.username : '';
+  if (typeof avatarPaint === 'function') avatarPaint();   // avatar + username (profile.js)
+  else { const b = $('acctBtn'); if (b) b.textContent = S.user ? S.user.username : ''; }
 }
-function show(){ applyAuth(); load(); }
+function show(){ applyAuth(); load(); if (typeof profileLoad === 'function') profileLoad(); }
 function logout(){ const t = S.token; dropSess(); if (t) fetch(API, {method: 'POST', body: JSON.stringify({action: 'logout', token: t})}).catch(()=>{}); authShow(); }
 
 const DEF_CFG = {pb_12min: '11:30-12:30', pb_5k: '4.9-5.2', pb_10k: '9.9-10.2', pb_hm: '21.0-21.3', pb_marathon: '42.1-42.6'};
@@ -348,6 +349,7 @@ if (typeof authShow !== 'function') window.authShow = () => alert('Layar login b
 
 (async () => {
   if (typeof authInit === 'function') authInit();
+  if (typeof profileInit === 'function') profileInit();
   if (S.token) {
     try { const j = await api('me'); setSess(S.token, j.expiresAt, j.user); } catch(e){}   // token ditolak -> api() sudah buka layar masuk
   }
