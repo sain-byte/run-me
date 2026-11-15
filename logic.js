@@ -1,4 +1,4 @@
-const API = 'GANTI_URL_DEPLOYMENT_BARU'; // <- tempel URL web app (deployment BARU, berakhiran /exec) di sini
+const API = 'https://script.google.com/macros/s/AKfycbwiRUSPDaaW_fcLyhRfvWK9K97wQnVFmz9Fw8jyo0HdSqVRwYA6Q52Tx42Kj4EeTgoV0w/exec'; // <- tempel URL web app (deployment BARU, berakhiran /exec) di sini
 const $ = id => document.getElementById(id);
 const MON = {jan:0,feb:1,mar:2,apr:3,mei:4,may:4,jun:5,jul:6,agu:7,ags:7,agt:7,aug:7,sep:8,okt:9,oct:9,nov:10,des:11,dec:11};
 const MID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
